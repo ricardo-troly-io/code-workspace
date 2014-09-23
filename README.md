@@ -1,4 +1,4 @@
-code-workspace
+Code Workspace
 ==============
 
 This is just a workspace for code snippets I've used in different systems.
