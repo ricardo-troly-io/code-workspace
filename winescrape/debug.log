@@ -1,0 +1,346 @@
+http://winetitles.com.au/widonline/wineries/details.asp?&crap=a&ID=48
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Winetitles Media | WID Online - Australian Wineries</title>
+
+<link rel="stylesheet" type="text/css" href="/includes/css/winebiz.textformatting.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="/includes/css/winebiz.new.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="/includes/css/winebiz.overview.css" media="screen" />
+
+<link rel="stylesheet" type="text/css" href="/includes/css/winebiz.wid.css?now=11/06/2016 7:08:23 PM" media="screen" />
+
+<link rel="alternate" type="application/rss+xml" title="DWN" href="http://www.winetitles.com.au/rss/" />
+
+<script src="/lib/simplebase/simplebase.min.js"></script>
+
+<!--[if lt IE 7]>
+<style type="text/css" media="screen">
+body { behavior: url(/lib/csshover/csshover3.htc); }
+</style>
+<![endif]-->
+
+</head>
+<body>
+
+<!--   <h1>Winebiz | Daily Wine News</h1> -->
+<div id="wrapper">
+<div id="all">
+
+<div id="topbarGWM"></div>
+<div id="main">
+<div id="titleGWM"> <a href="/widonline/"><img src="/images/WID-online.jpg" width="987" height="129" alt="WID Online" /></a>
+
+
+  <!-- close title -->
+</div>
+<table id="mainnav">
+  <tr>
+    <td class="tabend"><img src="/images/template/mainnav_left.png" alt="" width="28" height="18" /></td>
+    <td><!--Submenus-->
+
+      <div> <a href="/gwm/current_issue.asp">Current Issue</a> <a href="/gwm/back_issues.asp">Back Issues</a> <a href="/gwm/subscribe">Subscribe</a> <a href="/gwm/advertise.asp">Advertise</a> <a href="/gwm/about.asp">Editorial</a> </div>
+
+      <!--Top Level-->
+
+      <a href="/gwm/">Grapegrower &amp; Winemaker</a></td>
+    <td class="tabend"><img src="/images/template/mainnav_mid.png" alt="" width="24" height="18" /></td>
+        <td><!--Submenus-->
+
+<div> <a href="/wvj/current/">Current Issue</a>  <a href="/wvj/subscribe/">Subscribe</a> <a href="/wvj/advertise/">Advertise</a> </div>
+
+      <!--Top Level-->
+
+      <a href="/wvj/">Wine &amp; Viticulture Journal</a></td>
+    <td class="tabend"><img src="/images/template/mainnav_mid.png" alt="" width="24" height="18" /></td>
+    <td><!--Submenus-->
+
+
+      <!--Top Level-->
+
+      <a href="/wid/">Wine Industry Directory</a></td>
+    <td class="tabend"><img src="/images/template/mainnav_mid.png" alt="" width="24" height="18" /></td>
+    <td><!--Submenus-->
+
+      <div> </div>
+      <!--Top Level-->
+
+      <a href="/widonline/">WID Online</a></td>
+    <td class="tabend"><img src="/images/template/mainnav_mid.png" alt="" width="24" height="18" /></td>
+    <td><!--Submenus-->
+      <!--Top Level-->
+
+      <a href="/dwn/">Daily Wine News</a></td>
+    <td class="tabend"><img src="/images/template/mainnav_mid.png" alt="" width="24" height="18" /></td>
+    <td><!--Submenus-->
+
+      <div> </div>
+
+      <a href="/links/">Links</a></td>
+    <td class="tabend"><img src="/images/template/mainnav_mid.png" alt="" width="24" height="18" /></td>
+    <td><!--Submenus-->
+      <!--Top Level-->
+
+      <a href="http://winetitlesbookstore.com.au">Bookstore</a></td>
+    <td class="tabend"><img src="/images/template/mainnav_right.png" alt="" width="7" height="18" /></td>
+  </tr>
+</table>
+<table id="mainnav">
+  <tr>
+    <td class="tabend"><img src="/images/template/mainnav_left.png" alt="" width="28" height="18" /></td>
+    <td><!--Submenus-->
+
+      <div> <a href="/guide/">Search Buyers' Guide</a> </div>
+
+      <!--Top Level-->
+
+      <a href="/guide/">Buyers' Guide</a></td>
+    <td class="tabend"><img src="/images/template/mainnav_mid.png" alt="" width="24" height="18" /></td>
+    <td><!--Submenus-->
+
+      <div> </div>
+
+      <!--Top Level-->
+
+      <a href="http://www.winejobs.com.au">Wine Jobs</a></td>
+    <td class="tabend"><img src="/images/template/mainnav_mid.png" alt="" width="24" height="18" /></td>
+    <td><!--Submenus-->
+
+      <div> </div>
+
+      <!--Top Level-->
+
+      <a href="http://www.winetitlesclassifieds.com.au" target="_blank">Classifieds</a></td>
+    <td class="tabend"><img src="/images/template/mainnav_mid.png" alt="" width="24" height="18" /></td>
+    <td><!--Submenus-->
+
+      <div> </div>
+
+      <!--Top Level-->
+
+      <a href="/advertise/">Advertise</a></td>
+    <td class="tabend"><img src="/images/template/mainnav_mid.png" alt="" width="24" height="18" /></td>
+    <td><!--Submenus-->
+
+      <div> </div>
+
+      <!--Top Level-->
+
+      <a href="/widonline/wineries/">Winery Search</a></td>
+    <td class="tabend"><img src="/images/template/mainnav_mid.png" alt="" width="24" height="18" /></td>
+    <td><!--Submenus-->
+
+      <div> 
+      <a href="/calendar/type.asp?type=Conference">Conferences</a> 
+      <a href="/calendar/type.asp?type=Competition">Competitions</a> 
+      <a href="/widonline/courses/?list=all">Courses</a> 
+      <a href="/calendar/type.asp?type=Festival/Special Event">Festivals &amp; Special Events</a> 
+      <a href="/calendar/type.asp?type=Australian Wine Show">Australian Wine Shows</a> 
+      <a href="/calendar/type.asp?type=New Zealand Wine Show">New Zealand Wine Shows</a> 
+      <a href="/calendar/type.asp?type=Australian/New Zealand International Wine Show">ANZ International Wine Shows</a> 
+      <a href="/calendar/type.asp?type=Overseas Wine Show">Overseas Wine Shows</a> 
+      <a href="/calendar/type.asp?type=Trade Show">Trade Shows</a> </div>
+
+      <!--Top Level-->
+
+      <a href="/calendar/">Wine Shows &amp; Events</a></td>
+    <td class="tabend"><img src="/images/template/mainnav_mid.png" alt="" width="24" height="18" /></td>
+    <td><!--Submenus-->
+
+      <div> </div>
+
+      <!--Top Level-->
+
+      <a href="/statistics/default.asp">Statistics</a></td>
+    <td class="tabend"><img src="/images/template/mainnav_mid.png" alt="" width="24" height="18" /></td>
+    <td><!--Submenus-->
+
+      <div> </div>
+
+      <!--Top Level-->
+
+      <a href="/vintage/">Vintage Reports</a></td>
+    <td class="tabend"><img src="/images/template/mainnav_mid.png" alt="" width="24" height="18" /></td>
+    <td><!--Submenus-->
+
+      <div> </div>
+
+      <!--Top Level-->
+
+      <a href="/about/">About Us</a></td>
+    <td class="tabend"><img src="/images/template/mainnav_mid.png" alt="" width="24" height="18" /></td>
+    <td><!--Submenus-->
+
+      <div> </div>
+
+      <!--Top Level-->
+
+      <a href="/contact/">Contact Us</a></td>
+    <td class="tabend"><img src="/images/template/mainnav_right.png" alt="" width="7" height="18" /></td>
+  </tr>
+</table>
+
+<div id="content2" class="content2">
+<h1>WID Online - Australian Wineries</h1>
+ 
+<p><a href="http://www.winetitlesbookstore.com.au/" target="_blank"><img src="/images/wid/WID_online_banner1.jpg" title="Wine Industry Directory online" /></a></p>
+<h3>Angelicus Wines</h3>
+<p class='wid-details-p1'>
+<br /><strong>Established:</strong> 1997
+<br /><strong>Cellar Door Address:</strong> Catalano Road (via Lennard Road), Burekup, WA&nbsp;6227
+<br /><strong>T:</strong> 0429 481 425
+<br /><strong>W:</strong> <a target='_blank' href="http://www.angelicus.com.au" title='Click to visit in a new window.'>www.angelicus.com.au</a>
+<br /><strong><a href="http://www.angelicus.com.au/order_wines.12.html" target='_blank'>Click here to order online</a></strong>
+<br /><strong>GI Zone:</strong> South West Australia
+<br /><strong>GI Region:</strong> Geographe
+<br/><strong>Owners:</strong> John Ward, Susan Ward
+<br/><strong>Winemaker:</strong> John Ward
+<br/><strong>Viticulturist:</strong> Ryan Gibbs
+<br/><strong>Production Manager/Marketing:</strong> Susan Ward
+<br /><strong>Vineyards:</strong> Burekup, 1.1 ha
+<br /><strong>Variety used in production:</strong> Grenache, Shiraz, Tempranillo
+<br /><strong>Tonnes Crushed:</strong> Less than 10
+<br /><strong>Cases:</strong> Less than 999
+<br />Wine is made on site
+<br /><strong>Storage Capacity:</strong> 5,000 litres
+<br /><strong>Fermentation Capacity:</strong> 5,000 litres
+<br /><strong>Products:</strong> table wine
+<br /><strong>Brands:</strong> Angelicus, Cleavage, Panis
+<br /><strong>Site Facilities:</strong> Coffee/Light Meals, Gallery
+<br /><strong>Cellar Door Location: </strong>
+<script src='//maps.google.com/maps/api/js?v=3.15&amp;sensor=false'></script>
+
+<script>
+//<![CDATA[
+
+(function (w, fn) {
+	if (w.addEventListener) w.addEventListener("DOMContentLoaded", fn, false);
+	else if (w.attachEvent) w.attachEvent("onload", fn);
+})(window, function() {
+
+	function onClick() {
+		var	centre = map.getCenter(),
+			ll = centre.lat() + "," + centre.lng(),
+			url = "http://maps.google.com.au/maps?f=q&source=s_q&hl=en&ie=UTF8&q=Angelicus+Wines&ll=" + ll + "&z=13&iwloc=A&t=" + google.maps.MapTypeId.ROADMAP,
+			winsize = "width=" + (screen.availWidth - 10) + ",height=" + (screen.availHeight - 10);
+
+		window.open(url, "_blank", winsize + ",left=0,top=0,status=no,scrollbars=no,resizable=yes,menubar=yes,toolbar=no,location=no");
+	};
+
+	var map = new google.maps.Map(document.getElementById("gmap"), {
+			mapTypeId: google.maps.MapTypeId.ROADMAP,
+			mapTypeControl: true,
+			scaleControl: false,
+			scrollwheel: false,
+			streetViewControl: false,
+			navigationControlOptions: { style: google.maps.NavigationControlStyle.SMALL },
+
+			center: new google.maps.LatLng(-33.338411,115.87161400000002),
+
+			zoom: 13
+		}), clickTgt = map;
+
+	var marker = new google.maps.Marker({
+		map: map,
+		title: "Click for larger map of Angelicus Wines",
+		position: new google.maps.LatLng(-33.338411,115.87161400000002)
+	});
+	clickTgt = marker;
+
+
+	google.maps.event.addListener(clickTgt, "click", onClick);
+
+
+
+});
+
+//]]>
+</script>
+<div id='gmap' style='width: 630px; height: 300px; margin: 10px'>
+<noscript><iframe width='630px' height='300px' src="//maps.googleapis.com/maps/api/staticmap?sensor=false&amp;center=-33.338411,115.87161400000002&amp;zoom=13&amp;t=roadmap&amp;size=630x300&amp;key=AIzaSyD3fQWHYhLpt3zt_nTkXszEASmiZlGgDVM&amp;markers=-33.338411,115.87161400000002" frameborder='0' scrolling='no' marginheight='0' marginwidth='0'></iframe><br /></noscript>
+</div>
+
+
+<p><a href="./">Search again &raquo;</a></p>
+<p style="color:#009D4B; font-weight:bold">To be included in WID online, or to update your <em>Wine Industry Directory</em> details, please send an email to <a href="/cdn-cgi/l/email-protection#8ef9e7eacef9e7e0ebfae7fae2ebfda0ede1e3a0effb" style="color:#009D4B; text-decoration:underline"><span class="__cf_email__" data-cfemail="9fe8f6fbdfe8f6f1faebf6ebf3faecb1fcf0f2b1feea">[email&#160;protected]</span><script data-cfhash='f9e31' type="text/javascript">/* <![CDATA[ */!function(t,e,r,n,c,a,p){try{t=document.currentScript||function(){for(t=document.getElementsByTagName('script'),e=t.length;e--;)if(t[e].getAttribute('data-cfhash'))return t[e]}();if(t&&(c=t.previousSibling)){p=t.parentNode;if(a=c.getAttribute('data-cfemail')){for(e='',r='0x'+a.substr(0,2)|0,n=2;a.length-n;n+=2)e+='%'+('0'+('0x'+a.substr(n,2)^r).toString(16)).slice(-2);p.replaceChild(document.createTextNode(decodeURIComponent(e)),c)}p.removeChild(t)}}catch(u){}}()/* ]]> */</script></a>.</p><!-- close content --></div>
+
+<center><br /><a href="/dwn/links/?linkid=418" target="_blank"><img src="/images/ads/right/trifon-estate.jpg" alt="Trifon Estate" width="270" height="64" border="0" /></a></center><br />
+
+<!--Enter Wineries page only advert here before the closing center tag-->
+</center>
+
+
+<div id="ads" align="center">
+
+<p><a href="http://bit.ly/1zBtRwW" target="_blank"><img src="/images/ads/right/DB0649.gif" alt="AWRI" width="270" height="270" border="0" /></a></p>
+
+<p><a href="http://bit.ly/1JcwOOB" target="_blank"><img src="/images/ads/right/MAS0651.jpg" alt="Canberra Riesling Challenge" width="270" height="270" border="0" /></a></p>
+
+ <p><a href="http://bit.ly/1Qjhb5Y" target="_blank"><img src="/images/ads/right/MAS0590.gif" alt="Rivulis.com.au" width="270" height="270" border="0" /></a></p>
+
+ <p><a href="http://winetitlesbookstore.com.au" target="_blank"><img src="/images/ads/right/WID16_PRINT-AND-ONLINE_270px.jpg" alt="WID 2016" width="270" height="270" border="0" /></a></p>
+
+<p><a href="http://bit.ly/1PT9LwI" target="_blank"><img src="/images/ads/right/DB1167.jpg" alt="AWITC" width="270" height="270" border="0" /></a></p>
+
+<p><a href="http://logi242.xiti.com/go.url?xts=516462&xtor=AD-15&url=http://bayercropscience.com.au/cs/crops/viticulture.asp" target="_blank"><img src="/images/ads/right/MAS0277.gif" alt="Bayer" width="270" height="270" border="0" /></a></p>
+
+<p><a href="http://bit.ly/1Nksa2k" target="_blank"><img src="/images/ads/right/MAS0319-V3.gif" alt="Tankworks" width="270" height="250" border="0" /></a></p>
+
+<p><a href="http://bit.ly/1SPsyHY" target="_blank"><img src="/images/ads/right/CB6070.jpg" alt="Fischer Australis" width="270" height="220" border="0" /></a></p>
+
+ <p><a href="/cdn-cgi/l/email-protection#98eff1f6fdeae1d8f3f9edeaf1b6fbf7b6f6e2"><img src="/images/ads/right/DB1097.gif" alt="Kauri" width="270" height="120" border="0" /></a></p>
+ 
+  <p><a href="http://bit.ly/1MOAiTU" target="_blank"><img src="/images/ads/right/MAS0329.gif" alt="Rapidfil" width="270" height="120" border="1" /></a></p>
+
+ <p><a href="http://bit.ly/1NMnZLL" target="_blank"><img src="/images/ads/right/NE4073-V2.jpg" alt="AB Mauri" width="270" height="120" border="0" /></a></p>
+ 
+
+
+<p>
+  
+    
+
+    
+
+ 
+  </p>
+</div>
+
+
+<!-- close main --></div>
+   <div id="foot"><hr noshade="noshade" /> 
+  <div align="center"><img src="/images/template/footlogo_winetitles.png" alt="Winetitles Media" /> 
+  </div>
+  <div>
+      <a href="/contact/">Contact Us</a> |
+      <a href="/advertise/">Advertise With Us</a> |
+      <a href="/about/">About Winetitles</a> |
+      <a href="/privacy/">Privacy</a> |
+      <a href="/policies/">Policies</a> |  
+      <a href="/sitemap/">Sitemap</a>
+<!-- close footer nav --></div>
+     Copyright &copy; 1995-2016 Winetitles Media Pty Ltd (Division of Provincial Press Group). All Rights Reserved. 
+  <!-- close foot -->
+</div>
+
+<!-- close all --></div>
+<!-- close wrapper --></div>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-487704-7', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+ <script type="text/javascript">/* <![CDATA[ */(function(d,s,a,i,j,r,l,m,t){try{l=d.getElementsByTagName('a');t=d.createElement('textarea');for(i=0;l.length-i;i++){try{a=l[i].href;s=a.indexOf('/cdn-cgi/l/email-protection');m=a.length;if(a&&s>-1&&m>28){j=28+s;s='';if(j<m){r='0x'+a.substr(j,2)|0;for(j+=2;j<m&&a.charAt(j)!='X';j+=2)s+='%'+('0'+('0x'+a.substr(j,2)^r).toString(16)).slice(-2);j++;s=decodeURIComponent(s)+a.substr(j,m-j)}t.innerHTML=s.replace(/</g,'&lt;').replace(/>/g,'&gt;');l[i].href='mailto:'+t.value}}catch(e){}}}catch(e){}})(document);/* ]]> */</script></body>
+</html>

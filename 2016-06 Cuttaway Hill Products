@@ -1,0 +1,91 @@
+
+cids = Company.where("name LIKE '%surban%'").pluck(:id);
+
+cpids = CustomerProfile.where(:company_id => cids).pluck(:id);
+
+iids = Order.where(:customer_profile_id => cpids).pluck(:invoice_id);
+
+
+Invoice.where(:id => iids).group(:payment_status).count
+
+
+Invoice.where(:id => iids).group(:payment_status).last(2).each do |i|
+    i.orders.each do |o|
+        ol = o.order_lines.each do |ol|
+            puts "#{ol.quantity}\t#{ol.location.details}\t#{ol.name}\t#{ol.price}"
+        end
+    end
+end
+
+
+data = {}
+inumbers = ['160401013']
+Invoice.where(:number => inumbers).each do |i|
+    i.orders.each do |o|
+        ol = o.order_lines.each do |ol|
+            data[] = {}
+            data[][:qty] = ol.quantity
+            data[][:location] = ol.location.details
+            data[][:name] = ol.name
+            data[][:price] = ol.priceI drive
+            
+        end
+    end
+end
+
+#09534c
+#23857b
+
+
+
+[["Tractorless Vineyard Chardonnay", "Tractorless vineyard", 12852],
+ ["Tractorless Vineyard Rose", "Tractorless vineyard", 12853],
+ ["Laurence Sparkling Cabernet Sauvignon Merlot", nil, 10159],
+ ["Cutatway Hill Semillon Sauvignon Blanc", "Cuttaway Hill", 10157],
+ ["Cuttaway Merlot bottle", "Cuttaway Hill", 10055],
+ ["Laurence Sparkling Chardonnay Pinot Noir bottle", "Cuttaway Hill", 10054],
+ ["Cuttaway Pinot Noir bottle", "Cuttaway Hill", 10053],
+ ["Cuttaway Hill Sauvignon Blanc", "Cuttaway Hill", 10158],
+ ["Cuttaway Pinot Gris bottle", "Cuttaway Hill", 10052],
+ ["Cuttaway Chardonnay bottle", "Cuttaway Hill", 10051],
+ ["Tractorless vineyard Lost Flock", "Tractorless vineyard", 12854],
+ ["Tractorless Vineyard Pinot Gris", "Tractorless vineyard", 12851],
+ ["Tractorless Vineyard Riesling", "Tractorless vineyard", 12776]].each do |name,te,id|
+    Product.for_company(10034).where(:id => id).first.update_attributes(:te_divider => te)
+ end
+
+
+dividers = {}
+i=20
+Product.for_company(10034).where.not(:te_divider => [ '', nil ] ).order(:te_divider, :name).each do |p|
+Product.for_company(10034).order(:name).each do |p|
+puts "#{p.name} (#{p.te_divider}) => #{p.sort_weight}"
+p.update_attributes(:sort_weight => "#{p.te_divider[0]}#{i}")
+i = i + 1
+end;
+
+
+
+Product.for_company(10055).where.not(:te_divider => [ '', nil ] ).order(:sort_weight, :te_divider, :name).each do |p|
+puts "#{p.name} (#{p.te_divider}) => #{p.sort_weight}"
+end
+
+
+
+Addons layout changes (w/ last update)
+
+
+Breweries ONE - Variable Preferences
+Brewers TWO -> qty / prices / bulk / membership
+            -> squeezable products
+            -> product variations
+            -> stock take (paper trail)
+
+
+USD / i18n payments
+
+Nationwhde shipping
+
+
+
+paper trail audit rail
