@@ -43,7 +43,7 @@ SITE[:l1][:loops].each do |c|
   ##
 
   ## READ ##
-  doc = SITE[:fetch].call("#{SITE[:l1][:query]}" % c)
+  doc = SITE[:fetch].call("#{SITE[:l1][:query]}#{c}" % c)
   #doc = fetch_to_doc("#{url_root}?Winery_Name=#{chars[i]}")
 
   ## SPLIT ##
@@ -67,7 +67,7 @@ SITE[:l1][:loops].each do |c|
       ##
       ## Then READ the full details page before
       ## 
-      url = "#{SITE[:l2][:query]}" % [c, record_id]
+      url =SITE[:l2][:subs] ? "#{SITE[:l2][:query]}" % [c, record_id] : "#{SITE[:l2][:query]}#{record_id}"
 
       doc = SITE[:fetch].call(url)
       #doc = fetch_to_doc("http://www.winebiz.com.au/widonline/wineries/details.asp?ID=4590")
