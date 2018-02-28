@@ -11,12 +11,16 @@ Dir["lib/**/*.rb"].each {|file| load file }
 
 print "\nWelcome!\n"
 
-SITE = $WEBSITES[pick_from_array($WEBSITES,"Which website are you interested in?").to_sym]
+SITE = $WEBSITES[ARGV[0].to_sym] || $WEBSITES[pick_from_array($WEBSITES,"Which website are you interested in?").to_sym]
 
-if ('y' == stdin_for_regex(/y|n/, "Would you like a verbose output? (y/n)", 'n'))
-  $output_level = ('y' == stdin_for_regex(/y|n/, "..and include debug data? (y/n)",'n')) ? 2 : 1
-else
-  $output_level = 0
+$output_level = ARGV[1]
+
+if $output_level.nil?
+  if ('y' == stdin_for_regex(/y|n/, "Would you like a verbose output? (y/n)", 'n'))
+    $output_level = ('y' == stdin_for_regex(/y|n/, "..and include debug data? (y/n)",'n')) ? 2 : 1
+  else
+    $output_level ||= 0
+  end
 end
 
 
