@@ -11,12 +11,16 @@ Dir["lib/**/*.rb"].each {|file| load file }
 
 print "\nWelcome!\n"
 
-SITE = $WEBSITES[pick_from_array($WEBSITES,"Which website are you interested in?").to_sym]
+SITE = $WEBSITES[ARGV[0].to_sym] || $WEBSITES[pick_from_array($WEBSITES,"Which website are you interested in?").to_sym]
 
-if ('y' == stdin_for_regex(/y|n/, "Would you like a verbose output? (y/n)", 'n'))
-  $output_level = ('y' == stdin_for_regex(/y|n/, "..and include debug data? (y/n)",'n')) ? 2 : 1
-else
-  $output_level = 0
+$output_level = ARGV[1]
+
+if $output_level.nil?
+  if ('y' == stdin_for_regex(/y|n/, "Would you like a verbose output? (y/n)", 'n'))
+    $output_level = ('y' == stdin_for_regex(/y|n/, "..and include debug data? (y/n)",'n')) ? 2 : 1
+  else
+    $output_level ||= 0
+  end
 end
 
 
@@ -39,7 +43,7 @@ SITE[:l1][:loops].each do |c|
   ##
 
   ## READ ##
-  doc = SITE[:fetch].call("#{SITE[:l1][:query]}" % c)
+  doc = SITE[:fetch].call("#{SITE[:l1][:query]}#{c}" % c)
   #doc = fetch_to_doc("#{url_root}?Winery_Name=#{chars[i]}")
 
   ## SPLIT ##
@@ -63,7 +67,7 @@ SITE[:l1][:loops].each do |c|
       ##
       ## Then READ the full details page before
       ## 
-      url = "#{SITE[:l2][:query]}" % [c, record_id]
+      url =SITE[:l2][:subs] ? "#{SITE[:l2][:query]}" % [c, record_id] : "#{SITE[:l2][:query]}#{record_id}"
 
       doc = SITE[:fetch].call(url)
       #doc = fetch_to_doc("http://www.winebiz.com.au/widonline/wineries/details.asp?ID=4590")

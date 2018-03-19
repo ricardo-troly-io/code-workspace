@@ -1,5 +1,5 @@
 
-$WEBSITES[:AU] = { 
+$WEBSITES[:winebiz_au] = { 
   
   :label => 'Winebiz Australia',
 
@@ -20,6 +20,7 @@ $WEBSITES[:AU] = {
     }
   },
   :l2 => {
+    :subs => true,
     :query => 'http://winetitles.com.au/widonline/wineries/details.asp?&crap=%s&ID=%d',
     :record_breakdown => lambda { |doc| record_breakdown_winebiz(doc) }
   }
