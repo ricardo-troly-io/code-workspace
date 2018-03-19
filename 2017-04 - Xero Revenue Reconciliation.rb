@@ -29,16 +29,16 @@ def xero_save_buffer buffer, options={}
 end
 
 $learning_accounts = {
-	"Subscribility"=>"200",
-	"Stripe"=>"201",
-	"UPS"=>"201",
+	"Subscribility"=>"201",
+	"Stripe"=>"211",
+	"UPS"=>"211",
 	"Tasting Experience and Show"=>"201",
 	"Mailchimp"=>"201",
 	"Activity Summary"=>"201",
 	"FedEx"=>"201",
 	"WordPress Ecommerce"=>"201",
 	"Australia Post"=>"201",
-	"Online Payments"=>"202",
+	"Online Payments"=>"211",
 	"Text Messaging"=>"201",
 	"Data Export"=>"201",
 	"Fastway Prepaid"=>"201",
@@ -57,36 +57,36 @@ def define_xero_acc name, qty, subtotal, ol=nil
 		when *$learning_accounts.keys
 			acct = $learning_accounts[name]
 		when /^Subscribility$/, /^Platform access fee$/
-			acct=200
-		when /\d* payments processed$/, /\d* shipments dispatched$/, /\d* data syncs$/, /\d* orders completed$/, /\d* Payment processed$/, /^Usage fee/
 			acct=201
-		when /\d* payment provider transaction fees$/
+		when /\d* payments processed$/, /\d* shipments dispatched$/, /\d* data syncs$/, /\d* orders completed$/, /\d* Payment processed$/, /^Usage fee/
 			acct=202
+		when /\d* payment provider transaction fees$/
+			acct=211
 		when /\d* shipping provider transaction fees$/
-			acct=203
+			acct=212
 		when /\d* SMS sent$/, /^SMS$/, /^\d* SMS provider transaction fees$/
-			acct=204
+			acct=213
 		when /.*Support.*/, /.*Implementation.*/, /.* integration configuration$/, /^Setup.*/
-			acct=259
-		when /Monies owed to Subscribility/
+			acct=203
+		when /Monies owed to Subscribility/, /Monies owed to Troly/
 			acct=260
 		when /^Funds withheld$/, /^Payments made to providers$/
 			acct=620
-		when /Subscribility account credit/
+		when /Subscribility account credit/, /Troly account credit/
 			acct=415
 	end
 
 	if acct.nil?
 		puts ol.inspect
 		acct = RakeHelper::pick_from_array({
-			200=>'SAAS - Membership Income',
-			201=>'SAAS - Usage Fee Income',
-			202=>'BANKING - Surcharge Income',
-			203=>'SHIPPING - Surcharge Income',
-			204=>'SMS - Surcharge Income',
-			257=>'WEB - Web Hosting Income',
-			258=>'WEB - Web Development Income',
-			259=>'SAAS - Implementation & Support Services',
+			201=>'SAAS - Membership Income',
+			202=>'SAAS - Usage Fee Income',
+			211=>'BANKING - Surcharge Income',
+			212=>'SHIPPING - Surcharge Income',
+			213=>'SMS - Surcharge Income',
+			221=>'WEB - Web Hosting Income',
+			222=>'WEB - Web Development Income',
+			203=>'SAAS - Implementation & Support Services',
 			998=>'XX - Skip Line',
 			999=>'XX - Skip Invoice',
 			},"What should be the account number for '#{name}' (at $#{subtotal})?")
@@ -165,55 +165,55 @@ def push_invoices(options={})
 
 		catch :skip_invoice do
 			
-			i.orders.first.orderlines.where(:display_only => false).each do |ol|
+				i.orders.first.orderlines.where(:display_only => false).each do |ol|
 
-				acct = define_xero_acc(ol.name,ol.qty,ol.subtotal,ol)
+					acct = define_xero_acc(ol.name,ol.qty,ol.subtotal,ol)
 
-				next 						if acct == 998
-				throw :skip_invoice 		if acct == 999
-				
-				if acct == 620
+					next 						if acct == 998
+					throw :skip_invoice 		if acct == 999
+					
+					if acct == 620
 
-					identifier = "OID:#{ol.order_id}, OLID:#{ol.id}"
+						identifier = "OID:#{ol.order_id}, OLID:#{ol.id}"
 
-					if x_i.id.nil? && (x_i.save == false || (x_i = xero.Invoice.all(:where => {:type => "ACCREC", :invoice_number => i.number}).last).blank?)
+						if x_i.id.nil? && (x_i.save == false || (x_i = xero.Invoice.all(:where => {:type => "ACCREC", :invoice_number => i.number}).last).blank?)
 
-						RakeHelper::yputs("Invoice #{i.number} a prepayment registered and is currently being created in Xero. Run this again to ensure prepayment is recorded.","!")
+							RakeHelper::yputs("Invoice #{i.number} a prepayment registered and is currently being created in Xero. Run this again to ensure prepayment is recorded.","!")
+							
+							processed_numbers.delete(i.number)
+
+						elsif x_i.payments.select{ |payment| payment.reference == identifier }.present?
+
+							RakeHelper::pputs "Prepayment of $#{ol.price.abs} on invoice #{i.number} already recorded. Skipping."
+
+						else	
+
+							x_i.status = 'AUTHORISED'
+
+							RakeHelper::pputs "Recording prepayment of $#{ol.price.abs} as '#{ol.name}' against invoice #{i.number} (#{acct})"
+							payment=xero.Payment.build(:amount => ol.price.abs, :date => x_i.date, :status =>'AUTHORISED', :invoice => {:id => x_i.id}, :reference => identifier, :account => {:code => acct})
+							save_buffer[xero.Payment] << payment
+
+						end
+
+						x_i.add_line_item({
+							:quantity => 1,
+							:unit_amount => 0,
+							:description => "#{ol.name} (#{ol.price.abs})",
+							:account_code => acct
+						})
+
+					else
 						
-						processed_numbers.delete(i.number)
-
-					elsif x_i.payments.select{ |payment| payment.reference == identifier }.present?
-
-						RakeHelper::pputs "Prepayment of $#{ol.price.abs} on invoice #{i.number} already recorded. Skipping."
-
-					else	
-
-						x_i.status = 'AUTHORISED'
-
-						RakeHelper::pputs "Recording prepayment of $#{ol.price.abs} as '#{ol.name}' against invoice #{i.number} (#{acct})"
-						payment=xero.Payment.build(:amount => ol.price.abs, :date => x_i.date, :status =>'AUTHORISED', :invoice => {:id => x_i.id}, :reference => identifier, :account => {:code => acct})
-						save_buffer[xero.Payment] << payment
+						x_i.add_line_item({
+							:quantity => ol.qty,
+							:unit_amount => ol.price.to_f,
+							:description => ol.name,
+							:account_code => acct
+						})
 
 					end
-
-					x_i.add_line_item({
-						:quantity => 1,
-						:unit_amount => 0,
-						:description => "#{ol.name} (#{ol.price.abs})",
-						:account_code => acct
-					})
-
-				else
-					
-					x_i.add_line_item({
-						:quantity => ol.qty,
-						:unit_amount => ol.price.to_f,
-						:description => ol.name,
-						:account_code => acct
-					})
-
 				end
-			end
 
 			# register successful Credit Card payments made against that invoice
 			i.payments.where(:status => 'success', :trx =>'charge').each do |p|
@@ -261,8 +261,7 @@ def push_companies_to_xero from=nil
 	companies = Company.where(:is_fake => false)
 	companies = companies.where('created_at > :date OR updated_at > :date',:date => from) if from.present?
 
-	_from = from.present? ? " (from: #{from})" : ''
-	RakeHelper::dputs "Pushing companies to Xero#{_from}"
+	RakeHelper::dputs "Pushing companies to Xero" + (from.present? ? " (from: #{from})" : '')
 
 	companies.each do |c|
 
