@@ -1,4 +1,8 @@
 
+#####
+# COPY FROM HERE
+#####
+
 Dir.glob("#{Rails.root}/lib/tasks/helpers/*.rb") {|file| require file}
 include RakeHelper
 
@@ -71,6 +75,10 @@ records.order(company_id: :asc, id: :asc).each_with_index do |record, rdx|
 	end
 	wsheet.save if (rdx % 50 == 0) && !wsheet.is_a?(Hash)
 end;wsheet.save;
+
+######
+# ^^^ STOP COPYING HERE ^^^
+######
 
 mode = "DELETION" # "CREATION", "ALL", "DELETION"
 records.order(company_id: :asc, id: :asc).each do |record|
