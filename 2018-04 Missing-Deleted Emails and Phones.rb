@@ -18,7 +18,7 @@ range = Time.new(2017,07,01)..Time.now
 stats = { }
 
 # cids = CompanyCustomer.where(:company_id => [b,w]).pluck(:customer_id);
-records = Customer.where(:company => Company.active.joins(:integrations).where(:integrations => {:provider => 'Wordpress', :status => 'ready'}));
+records = Customer.where(:company => Company.active.joins(:integrations).where(:integrations => {:provider => 'Wordpress', :status => ['uninstalled','ready']}));
 
 mode = "DELETION" # "CREATION", "ALL", "DELETION"
 prev_id = records.first.company_id
