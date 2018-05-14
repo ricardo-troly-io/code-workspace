@@ -1,4 +1,8 @@
 
+#####
+# COPY FROM HERE
+#####
+
 Dir.glob("#{Rails.root}/lib/tasks/helpers/*.rb") {|file| require file}
 include RakeHelper
 
@@ -7,8 +11,11 @@ w = 10390
 
 check = ['phone','email']
 
+
 range = Time.new(2018,2,28)..Time.new(2018,3,8);
 #range = Time.new(2018,4,18)..Time.new(2018,4,30)
+
+records = Customer.where(:company => Company.active.joins(:integrations).where(:integrations => {:provider => 'Wordpress', :status => ['uninstalled','ready']}));
 
 range = Time.new(2018,1,1)..Time.now
 stats = { }
@@ -22,9 +29,7 @@ records = Customer.where(:id => c_ids).where("updated_at >= ?", range.begin);
 
 mode = "ALL" # "CREATED", "ALL", "DELETED", "UPDATED"
 header_out = false
-records.each do |record|
-
-	most_recent_value = {}
+records.order(company_id: :asc, id: :asc).each do |record|
 
 	check.each do |chk|
 		header_out = false
