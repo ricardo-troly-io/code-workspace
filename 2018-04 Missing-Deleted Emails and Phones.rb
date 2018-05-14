@@ -10,20 +10,24 @@ check = ['phone','email']
 range = Time.new(2018,2,28)..Time.new(2018,3,8);
 #range = Time.new(2018,4,18)..Time.new(2018,4,30)
 
-#range = Time.new(2010,02,28)..Time.now
+range = Time.new(2018,1,1)..Time.now
 stats = { }
 
-c_ids = CompanyCustomer.where(:company_id => [b,w]).pluck(:customer_id);
-records = Customer.where(:id => c_ids);
+
+co_ids = Company.active.joins(:integrations).where(:integrations => {:provider => 'Wordpress', :status => ['uninstalled','ready']}).pluck(:id);
+
+c_ids = CompanyCustomer.where(:company_id => co_ids).pluck(:customer_id);
+c_ids = CompanyCustomer.where(:company_id => w).pluck(:customer_id);
+records = Customer.where(:id => c_ids).where("updated_at >= ?", range.begin);
 
 mode = "ALL" # "CREATED", "ALL", "DELETED", "UPDATED"
+header_out = false
 records.each do |record|
 
 	most_recent_value = {}
-	new_line = false
 
 	check.each do |chk|
-
+		header_out = false
 		changes = record.versions.where("object_changes LIKE '%#{chk}%'")
 		
 		if range.present?
@@ -31,18 +35,35 @@ records.each do |record|
 		end
 
 		if changes.present?
-			new_line = true
 
-			RakeHelper::yputs "#{changes.count} changes to #{chk.yellow} for #{record}"
 			changes.each do |chg|
+
 				details = /#{chk}\:\n\-\s(.*)\n\-\s(.*)/.match(chg.object_changes)
 				if details.present?
+					
+					d=[]
+					[1,2].each do |k|
+						d[k] = details[k].gsub(/^[\'\"\\]*/,"").gsub(/[\\\'\"]*$/,"")
+					end
 
-					most_recent_value[chk] = details[2] if (details[2].present? && details[2] != "''")
+					if d[1].blank? && d[2].blank?
+						next
+					elsif !header_out
+						header_out = true
+						RakeHelper::yputs "#{changes.count} changes made to #{chk.yellow} for #{record}"
+					end
+					
+					if chg.whodunnit.blank?
+						if (d[2].present?)
+							most_recent_value[chk] = d[2]
+						elsif (d[1].present?)
+							most_recent_value[chk] = d[1]
+						end
+					end
 
 					op = "UPDATED"
-					op = "CREATED" if (details[1].blank?)
-					op = "DELETED" if (details[2].blank? || details[2] == "''")
+					op = "CREATED" if (d[1].blank?)
+					op = "DELETED" if (d[2].blank?)
 
 					stats_index = chg.created_at.to_s[0..9]
 					stats[op] = stats[op] || {}
@@ -51,7 +72,8 @@ records.each do |record|
 					if mode == "ALL" || mode == op
 						op = (op.present? && op[0] == 'C' ? op.green : (op.present? && op[0] == 'D' ? op.red : (op.present? && op[0] == 'U' ? op.yellow : "")))
 						who = chg.whodunnit.present? ? User.find(chg.whodunnit).fname : "?"
-						RakeHelper::pputs "on\t#{chg.created_at}: #{details[1].ljust(40,' ')} "+"→".green+" #{details[2].ljust(40,' ')} #{op} (#{who})"
+						#RakeHelper::pputs "on\t#{chg.created_at}: #{details[1].ljust(40,' ')} "+"→".green+" #{details[2].ljust(40,' ')} #{op} (#{who})"
+						RakeHelper::pputs "on\t#{chg.created_at}:\t#{d[1].ljust(40,' ')}\t#{d[2].ljust(40,' ')}\t#{op}\t(#{who})"
 					end
 				else
 				#	puts details.inspect
@@ -59,18 +81,16 @@ records.each do |record|
 			end
 		end
 	end
-
 	restoring = false
 	most_recent_value.each do |k,v|
 		if v.present? && record[k] != v
-			RakeHelper::gputs "Restoring #{k} for #{record} to _ #{v} _"
+			RakeHelper::gputs "Restoring #{k} for #{record} to _#{v}_"
 			#record.update_attribute(k => v)
 			restoring = true
 		end
 	end
 
-	#RakeHelper::rputs "No changes to restore for #{record}" unless restoring
-	
-	puts "" if new_line
+	puts "" if header_out
+	header_out = false
 
 end;nil
