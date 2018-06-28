@@ -77,13 +77,92 @@ def find_stage(id)
 	return stage ? stage.first[1]["title"] : stage
 end
 
+# finds a custom field by name (ie, personalisation tag) on given AC contact. returns nil when not found
+def find_in_ac_contact_fields(ac_contact,field)
+    
+    field = field.upcase
+    field = "%" + field + "%" if field[0] != "%"
+
+    return ac_contact["fields"].select{ |k,v| v["tag"] == field}.first[1]["val"]
+end
+
+
+##
+## 
+##
+## UPDATING EMPTY fields to 'EMPTY'
+
+def force_EMPTY_on_some_fields
+
+    page=1
+    loop do
+            
+        # note - it appears that some contacts are not pulled by this query - needs to be investigated as to why. 
+        # todo with list membership?
+        res=ac_get('contact_list', {'filters[id_greater]' => '0', 'page' => page});
+        res.delete("result_code")
+        res.delete("result_message")
+        res.delete("result_output")
+
+        if res.blank?
+            RakeHelper::rputs "Page #{page} contains no contacts."
+            break;
+        end
+
+        RakeHelper::yputs  "Processing #{res.count} records from page #{page}."
+
+        res.keys.each do |k|
+            ac_contact = res[k]
+            contact_updates = {}
+
+            #
+            #
+            t_user_id = find_in_ac_contact_fields(ac_contact,"TUSERID")
+            if t_company_id.blank?
+                contact_updates["field[%TCOMPANYID%,0]"] = 'EMPTY'
+            end
+
+            #
+            #
+            t_company_id = find_in_ac_contact_fields(ac_contact,"TCOMPANYID")
+            if t_company_id.blank?
+                contact_updates["field[%TCOMPANYID%,0]"] = 'EMPTY'
+            end
+
+            #
+            #
+            gd_plan_key = find_in_ac_contact_fields(ac_contact,"GDPLANKEY")
+
+            if gd_plan_key.blank?
+                contact_updates["field[%GDPLANKEY%,0]"] = 'EMPTY'
+            end
+
+            #
+            #
+            gd_workspace_key = find_in_ac_contact_fields(ac_contact,"GDWORKSPACEKEY")
+            if gd_workspace_key.blank?
+                contact_updates["field[%GDWORKSPACEKEY%,0]"] = 'EMPTY'
+            end
+
+            if contact_updates.present?
+                contact_updates["id"] = ac_contact["id"]
+                contact_updates["overwrite"] = "0" # IMPORTANT!!!! 
+                ac_post("contact_edit", contact_updates)
+                RakeHelper::gputs "UPDATING https://troly.activehosted.com/app/contacts/" + ac_contact["id"]
+            else
+                RakeHelper::gputs "No updates to https://troly.activehosted.com/app/contacts/" + ac_contact["id"]
+            end
+        end
+
+        page=page+1
+    end
+end
+
+
 
 
 ##
 ##
-##
-##
-
 
 
 
@@ -184,7 +263,7 @@ def deal_sync_w_gsheet(doc_name,sheet_name,rand_sleep=3)
 end;
 
 
-deal_sync_w_gsheet 'Jules AC Call Worksheet','Master Call Sheet'
+deal_sync_w_gsheet 'Jules AC Call Worksheet','Master Call Sheet', 0
 
 
 
