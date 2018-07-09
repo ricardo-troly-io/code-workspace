@@ -118,8 +118,8 @@ def force_EMPTY_on_some_fields
             #
             #
             t_user_id = find_in_ac_contact_fields(ac_contact,"TUSERID")
-            if t_company_id.blank?
-                contact_updates["field[%TCOMPANYID%,0]"] = 'EMPTY'
+            if t_user_id.blank?
+                contact_updates["field[%TUSERID%,0]"] = 'EMPTY'
             end
 
             #
