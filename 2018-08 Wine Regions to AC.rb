@@ -94,6 +94,8 @@ CA, North Coast
 CA, North Coast - Mendocino
 CA, North Coast - Mendocino - Dos Rios
 CA, North Coast - Mendocino - Covelo
+CA, North Coast - Mendocino - Cole Ranch
+CA, North Coast - Mendocino - McDowell Valley
 CA, North Coast - Mendocino - Redwood Valley
 CA, North Coast - Mendocino - Potter Valley
 CA, North Coast - Mendocino - Anderson Valley
@@ -101,11 +103,13 @@ CA, North Coast - Mendocino - Mendocino Ridge
 CA, North Coast - Mendocino - Yorkville Highlands
 
 CA, North Coast - Clear Lake
+CA, North Coast - Clear Lake - Benmore Valley
 CA, North Coast - Clear Lake - High Valley
 CA, North Coast - Clear Lake - Big Valley District
 CA, North Coast - Clear Lake - Kelsey Bench
 CA, North Coast - Clear Lake - Red Hills
 CA, North Coast - Clear Lake - Guenoc Valley
+CA, North Coast - Clear Lake - Bench-Lake county
 
 CA, North Coast - Sonoma
 CA, North Coast - Sonoma - Dry Creek Valley
@@ -123,7 +127,7 @@ CA, North Coast - Sonoma - Sonoma Mountain
 CA, North Coast - Sonoma - Moon Mountain
 CA, North Coast - Sonoma - Sonoma Valley
 CA, North Coast - Sonoma - Bennett Valley
-CA, North Coast - Sonoma - Carneros
+CA, North Coast - Sonoma - Los Carneros
 
 CA, North Coast - Napa Valley
 CA, North Coast - Napa Valley - Calistoga
@@ -134,12 +138,12 @@ CA, North Coast - Napa Valley - St. Helena
 CA, North Coast - Napa Valley - Rutherford
 CA, North Coast - Napa Valley - Oakville
 CA, North Coast - Napa Valley - Atlas Peak
-CA, North Coast - Napa Valley - Stage Leap District
+CA, North Coast - Napa Valley - Stags Leap District
 CA, North Coast - Napa Valley - Yountville
 CA, North Coast - Napa Valley - Oak Knoll District
 CA, North Coast - Napa Valley - Mount Veeder
 CA, North Coast - Napa Valley - Wild Horse Valley
-CA, North Coast - Napa Valley - Carneros
+CA, North Coast - Napa Valley - Los Carneros
 CA, North Coast - Napa Valley - Coombsville
 CA, North Coast - Napa Valley - Chiles Valley
 
