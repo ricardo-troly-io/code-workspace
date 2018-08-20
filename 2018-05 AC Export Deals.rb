@@ -35,6 +35,266 @@ def ac_get_deal(params)
     return ac_deal
 end
 
+def get_col(columns, question, regex_matches=nil)
+
+    if regex_matches.present?
+
+        match_cols = columns.select{ |k,v| v.match(Regexp.new(regex_matches)) }
+        return match_cols.keys.first+1 if match_cols.size == 1
+
+        columns = match_cols if match_cols.size > 1
+    end
+
+    return (RakeHelper::pick_from_array(columns, question).to_i + 1)
+end
+
+def add_website_intel_to_sheet(wsheet_or_session = nil)
+
+    if (wsheet_or_session.is_a? GoogleDrive::Session)
+        session = wsheet_or_session
+        wsheet = RakeHelper::init_google_worksheet nil, nil, session
+    elsif (wsheet_or_session.is_a? GoogleDrive::Worksheet)
+        session = nil
+        wsheet = wsheet_or_session
+        wsheet.reload
+    else
+        session = RakeHelper::init_google_session
+        wsheet = RakeHelper::init_google_worksheet nil, nil, session
+    end
+
+    columns=Hash[(0...wsheet.rows[0].size).zip wsheet.rows[0]]
+    website_col=get_col(columns, "Where is the website URL stored in?","url|web");
+    intel_col=get_col(columns, "Where should we store results in?", "cms");
+
+    i=2 #skip first row (header)
+    pending_changes = 0
+    while i <= wsheet.max_rows do
+
+        if wsheet[i,website_col].present? 
+            if wsheet[i,intel_col].blank?
+                #RakeHelper::pputs wsheet[i,website_col]
+                
+                website_intel = get_website_intel(wsheet[i,website_col])
+                if website_intel.present?
+
+                    cms = (website_intel[:website_cms].present? ? website_intel[:website_cms] : ( website_intel[:code] != 200 ? "Website Error" : ( website_intel[:competitor].present? ? website_intel[:competitor] : "" ) ))
+
+                    wsheet[i,intel_col] = website_intel.map{|k,v| "#{k}: #{v}"}.join("\n")
+                    #wsheet[i,intel_col] = cms
+                    
+                    
+                    if cms.present? # prepare for saving
+                        pending_changes = pending_changes + 1
+                        RakeHelper::pputs "[#{pending_changes}] #{wsheet[i,website_col]} updated (#{cms})"
+                        #wsheet.save
+                    else
+                        RakeHelper::yputs("No intel found for #{wsheet[i,website_col]}", "→")
+                    end
+                end
+            else
+                RakeHelper::yputs "Intel cell not empty for #{wsheet[i,website_col]}"
+            end
+        else
+            RakeHelper::rputs "No website found for row #{i}"
+        end
+
+        i=i+1
+
+        if (pending_changes >= 25) # only save max 25 ros
+            RakeHelper::gputs "Saving #{pending_changes} records"
+            wsheet.save
+            pending_changes = 0
+        end
+    end
+
+    if pending_changes > 0
+        RakeHelper::gputs "Saving the last #{pending_changes} records"
+        wsheet.save
+    end
+
+    return [session,wsheet]
+end
+
+
+def get_website_intel(domain, level=0)
+    ua = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'
+
+    domain.gsub!(/^http(s)?:\/\//,"")
+    domain.gsub!(/^www\./,"")
+    domain.gsub!(/\/$/,"")
+    domain.gsub!(/[^a-zA-Z0-9\.\-]/,"")
+
+    website_url = ''
+    response = ''
+
+    [
+        "https://store.#{domain}",
+        "https://shop.#{domain}/Wines",
+        "https://shop.#{domain}/index.cfm",
+        "https://shop.#{domain}",
+        "https://#{domain}/shop",
+        "https://#{domain}/store",
+        "https://www.#{domain}/shop",
+        "https://www.#{domain}",
+        "https://#{domain}",
+
+    ].each do |website|
+    
+        RakeHelper::yputs "Checking #{website}" if level > 1
+        begin
+
+            begin
+                response = HTTParty.get(website, {:follow_redirects => true, :timeout => 5, headers: {"User-Agent" => ua}})
+            rescue Errno::ECONNRESET, Errno::ECONNREFUSED, OpenSSL::SSL::SSLError, HTTParty::RedirectionTooDeep, Net::OpenTimeout
+                RakeHelper::rputs "Connection refused or SSL error encountered, trying HTTP" if level > 1
+                response = HTTParty.get(website.sub!(/^https/,"http"), {:verify => false, :follow_redirects => true, :timeout => 5, headers: {"User-Agent" => ua}})
+            end
+
+            begin
+                response.blank? # seems to be the only way around UTF-8 Errors....! 
+            rescue # seems to be the only way around UTF-8 Errors....!
+                response = '' 
+            end
+
+            if response.present? && response.code == 200 && response.match(/(web)?site not found/i).blank? && response.match(/<\/?head>/) && response.size > 1024
+                website_url = website
+            end
+        rescue
+
+        end
+        
+        break if website_url.present?
+    end
+    
+    intel = {
+        :website_cms => '',
+        :competitor => '',
+        :domain => domain,
+        :code => response.present? ? response.code : 404,
+        :ssl_enabled => website_url.match(/^https/).present?,
+        :url => website_url.to_s,
+    }
+
+    if website_url.blank?
+        RakeHelper::rputs "No matching URL found for #{domain}" if level > 0
+        return intel 
+    end
+
+    RakeHelper::pputs "Inspecting #{website_url} (#{response.code})" if level > 1
+
+    generator = response.match(/name="(generator)" content="(.*?)"/);
+    generator = response.match(/name="(platform|author)" content="(.*?)"/) if generator.blank?
+
+    if (generator.present?)
+        case generator[2]
+        when /Go Daddy/i
+        when /Starfield Technologies/i
+            intel[:website_cms] = 'GoDaddy'
+        when /vinSUITE/i
+            intel[:competitor] = 'vinSuite'
+        when /eWinery Solutions/
+            intel[:competitor] = 'vinSuite (eWinery Solutions)'
+        when /Wix/i
+            intel[:website_cms] = 'Wix.com'
+        when /simplyCMS/i
+            intel[:website_cms] = 'simplyCMS'
+            intel[:competitor]  = 'simplyCMS'
+        when /WineDirect|vin65/i
+            intel[:website_cms]  = 'WineDirect'
+            intel[:competitor]  = 'WineDirect'
+        when /Commerce by Figure/i
+            intel[:competitor]  = 'Figure'
+        when /Xudle\.com|X&uuml;dle/i
+            intel[:competitor]  = 'Xudle'
+            intel[:website_cms]  = 'Xudle'
+        when /Drupal/i
+            intel[:website_cms] = 'Drupal'
+        when /SiteBuilder/i
+            intel[:website_cms] = 'Y! SiteBuilder'
+        when /Joomla/i
+            intel[:website_cms] = 'Joomla'
+        when /WordPress/i
+            intel[:website_cms] = 'WordPress'
+        else 
+            if (response.match(/name="(generator)" content="(.*?)"/))
+                intel[:website_cms] = generator[2]
+                RakeHelper::yputs "Generator Not Handled: #{generator[2]} (#{website_url})" 
+            end
+        end
+    end
+
+    if website_url.match(/(store|shop)\./)
+        tmp_response = nil;
+        begin
+            begin
+                tmp_response = HTTParty.get(website_url.sub(/\/\/(store|shop)\./,"\/\/www."), {:follow_redirects => true, :timeout => 5, headers: {"User-Agent" => ua}})
+            rescue Errno::ECONNRESET, Errno::ECONNREFUSED
+                RakeHelper::rputs "Connection refused, trying without www" if level > 1
+                tmp_response = HTTParty.get(website_url.sub(/\/\/(store|shop)\./,"\/\/"), {:verify => false, :follow_redirects => true, :timeout => 5, headers: {"User-Agent" => ua}})
+            rescue OpenSSL::SSL::SSLError, HTTParty::RedirectionTooDeep, Net::OpenTimeout
+                RakeHelper::rputs "SSL error encountered, trying HTTP" if level > 1
+                tmp_response = HTTParty.get(website_url.sub(/^https/,"http"), {:verify => false, :follow_redirects => true, :timeout => 5, headers: {"User-Agent" => ua}})
+            end
+        rescue
+                
+        end
+        
+        begin
+            tmp_response.blank? # seems to be the only way around UTF-8 Errors....! 
+        rescue # seems to be the only way around UTF-8 Errors....!
+            tmp_response = '' 
+        end
+
+        if tmp_response.present?
+            response = tmp_response 
+            RakeHelper::yputs("Detected different website and shop CMS!", "!!") if level > 0
+            intel[:shop_url] = intel[:url]
+            intel[:url] = response.request.last_uri.to_s.gsub(/(https?:\/\/[^\/\?#]*).*/,'\1')
+        end
+    end
+
+    tests = {
+        /([a-zA-Z0-9]*)\.securewinemerchant\.com/ => { :competitor => 'simplyCMS', :shop_url => 'https://\1.securewinemerchant.com'},
+        /([a-zA-Z0-9]*)\.orderport\.net/ => { :competitor => 'OrderPort', :shop_url => 'https://\1.orderport.net'},
+        /\?fuseaction/                      => { :competitor => 'eCellar' },
+        /vin65\.com|winedirect\.com/        => { :competitor => 'WineDirect' },
+        /\/cruclub\//                       => { :competitor => 'cruio' },
+        /(wp99234|subscribility)/           => { :competitor => 'Troly' },
+        /\/(wp-content|wp-login)\//         => { :website_cms => 'WordPress' },
+        /cdn\.shopify\.com\//               => { :website_cms => 'shopify' },
+        /cdn\d+\.bigcommerce\.com\//        => { :website_cms => 'BigCommerce' },
+        /www\.web\.com/                     => { :website_cms => 'Custom - Web.com' },
+        /Muse\.Assert\.fail|data-muse-uid/  => { :website_cms => 'Adobe Muse' },
+        /cdn\.nexternal\.com\//             => { :competitor => 'Nexternal' },
+        /static\d+\.squarespace\.com\//     => { :website_cms => 'Squarespace' },
+        /www\.weebly\.com/                  => { :website_cms => 'Weebly' },
+        /platform\.vinespring\.com/         => { :competitor => 'VineSpring' },
+        /\.xudle\.(com|min)/                => { :competitor => 'Xudle' },
+        /\.google-analytics\.com\/analytics\.js/ => { :ga => 'true' },
+        /_gat\._getTracker\("([^"]*)"\)/    => { :ga => '\1' },
+        /instagram\.com\/([^\/\"]*)/        => { :insta => 'https://instagram.com/\1' },
+        /twitter\.com\/([^\/\"]*)/          => { :tw => 'https://twitter.com/\1' },
+        /(fb\.com|facebook\.com)\/([^"]*)/  => { :fb => 'https://fb.com/\2' },
+    }
+    
+    tests.each do |t, new_intel|
+        RakeHelper::pputs "Testing for regexp #{t}" if level > 2
+        if (match = response.match(t)).present?
+            new_intel.each do |k,v|
+                intel[k] = match[0].sub(t,v)
+                #intel = intel.merge(new_intel)
+            end
+        end
+    end
+
+    #intel[:website_cms] = intel[:competitor] if intel[:website_cms].blank?
+
+    return intel
+end
+
+session=add_website_intel_to_sheet 
+get_website_intel(domain)
+
 def is_wordpress(website)
     website = "http://#{website}" unless website.match(/^http/)
     begin
@@ -86,7 +346,93 @@ def find_in_ac_contact_fields(ac_contact,field)
     return ac_contact["fields"].select{ |k,v| v["tag"] == field}.first[1]["val"]
 end
 
+def import_new_tags doc_name, rand_sleep
+    
+    RakeHelper::gputs "Loading #{doc_name} gsheet.."
+    
+    session = RakeHelper::init_google_session 53339
 
+    wsheet = RakeHelper::init_google_worksheet nil, doc_name, session
+
+
+    columns=Hash[(0...wsheet.rows[0].size).zip wsheet.rows[0]]
+    email_col=(RakeHelper::pick_from_array(columns, "What column are EMAILS stored in?").to_i + 1);
+    new_tag_col=(RakeHelper::pick_from_array(columns, "What column are NEW TAGS stored in?").to_i + 1);
+    acct_col=(RakeHelper::pick_from_array(columns, "What column are ACCOUNT MANAGERS stored in?").to_i + 1);
+
+    i=2 #skip first row (header)
+    while i <= wsheet.max_rows do
+
+        if (wsheet[i,email_col].present?)
+        
+            new_tags_updates = []
+            
+            ac_contact = ac_get('contact_view_email', {"email" => wsheet[i,email_col]})
+            new_tags = wsheet[i,new_tag_col]
+            new_tags.split(',').each do |t|
+                if !ac_contact["tags"].include?(t)
+                    new_tags_updates << t
+                end
+            end
+            if new_tags_updates.present?
+                contact_updates = {}
+                contact_updates["id"] = ac_contact["id"]
+                contact_updates["overwrite"] = "0" # IMPORTANT!!!! 
+                contact_updates["tags"] = (ac_contact["tags"] + new_tags_updates).join(',')
+                ac_post("contact_edit", contact_updates)
+                RakeHelper::pputs "Processing #{wsheet[i,email_col]} (https://troly.activehosted.com/app/contacts/" + ac_contact['id'] + ")"
+            else
+                RakeHelper::rputs "No new tags for #{wsheet[i,email_col]} (https://troly.activehosted.com/app/contacts/" + ac_contact['id'] + ")"
+            end
+
+            ac_deal = ac_get_deal({ 'filters[pipeline]' => '1', 'filters[contactid]' => ac_contact['id'], 'status' => '0' });
+            agent = find_agent(nil,wsheet[i,acct_col].to_s)
+
+            if ac_deal.blank?
+                RakeHelper::rputs "Deal missing for #{wsheet[i,email_col]} (https://troly.activehosted.com/app/contacts/" + ac_contact['id'] + ")"
+            elsif agent.blank?
+                RakeHelper::rputs "Agent not found #{wsheet[i,acct_col]} (https://troly.activehosted.com/app/contacts/" + ac_contact['id'] + ")"
+            elsif (agent["id"] != ac_deal["owner"])
+                RakeHelper::pputs "Updating agent for deal #{ac_deal['id']} to #{agent["first_name"]}"
+                ac_post('deal_edit',{'id' => ac_deal['id'],'userid'=>agent["id"]})
+            end
+        end
+        
+        i=i+1
+        
+        sleep(rand(rand_sleep)) if rand_sleep.present?
+    end
+
+end
+import_new_tags 'Jules AC Call Worksheet', 2
+
+
+def delete_deals
+
+    page=1
+    loop do
+
+        res=ac_get('contact_list', {'filters[tagname]' => 'DELETE_DEAL', 'page' => page});
+        res.delete("result_code")
+        res.delete("result_message")
+        res.delete("result_output")
+
+        res.keys.each do |k|
+            ac_contact = res[k]
+            ac_deal = ac_get_deal({ 'filters[pipeline]' => '1', 'filters[contactid]' => ac_contact['id'], 'status' => '0' });
+
+            if ac_deal.blank?
+                RakeHelper::rputs "No Deal for contact https://troly.activehosted.com/app/contacts/" + ac_contact['id']
+            else
+                RakeHelper::gputs "Deleting Deal https://troly.activehosted.com/app/contacts/" + ac_contact['id'] + "/deal/"
+            end
+            sleep(1);
+        end
+
+        page=page+1
+
+    end
+end
 ##
 ## 
 ##
@@ -176,7 +522,7 @@ def deal_sync_w_gsheet(doc_name,sheet_name,rand_sleep=3)
 
 
     columns=Hash[(0...wsheet.rows[0].size).zip wsheet.rows[0]]
-    acct_col=(RakeHelper::pick_from_array(columns, "What column are ACCOUNT MANAGERS stored in?").to_i + 1);
+    acct_col=get_col(columns, "Where are the account managers stored in?", "ACCOUNT");
 
     ## Update all deals owner and contacts based on changes
 
@@ -190,7 +536,7 @@ def deal_sync_w_gsheet(doc_name,sheet_name,rand_sleep=3)
     	if deal_id.present?
 
     		deals_rows[deal_id] = i;
-
+if false
     		ac_deal = ac_post('deal_get',{'id' => deal_id})
     		agent = find_agent(nil,wsheet[i,acct_col].to_s)
 
@@ -200,6 +546,7 @@ def deal_sync_w_gsheet(doc_name,sheet_name,rand_sleep=3)
 
                 sleep(rand(rand_sleep)) if rand_sleep.present?
     		end
+end
     	end
     	i=i+1
     end
@@ -241,14 +588,20 @@ def deal_sync_w_gsheet(doc_name,sheet_name,rand_sleep=3)
     		wsheet[row,7] = ac_contact["fields"].select{ |k,v| v["tag"] == "%TCOMPANYCREATEDAT%"}.first[1]["val"]
 
     		gd_plan_key = ac_contact["fields"].select{ |k,v| v["tag"] == "%GDPLANKEY%"}.first[1]["val"]
-    		wsheet[row,9] = gd_plan_key.present? ? '=HYPERLINK("https://docs.google.com/document/d/'+gd_plan_key+'", "'+gd_plan_key+'")' : ''
+    		wsheet[row,9] = (gd_plan_key.present? && !gd_plan_key.blank?) ? '=HYPERLINK("https://docs.google.com/document/d/'+gd_plan_key+'", "'+gd_plan_key+'")' : ''
 
-    		wsheet[row,10] = ac_contact["fields"].select{ |k,v| v["tag"] == "%BESTCONTACTTIME%"}.first[1]["val"]
-    		wsheet[row,11] = ac_contact["email"]
-    		wsheet[row,14] = agent["first_name"]
+    		#wsheet[row,10] = ac_contact["fields"].select{ |k,v| v["tag"] == "%BESTCONTACTTIME%"}.first[1]["val"]
+    		wsheet[row,10] = ac_contact["email"]
+    		wsheet[row,11] = agent["first_name"]
 
-    		wsheet[row,19] = find_stage(ac_deal["stage"])
-            wsheet[row,20] = ac_contact["tags"].join(", ")
+    		wsheet[row,20] = find_stage(ac_deal["stage"])
+            wsheet[row,23] = ac_contact["tags"].join(", ")
+
+            wsheet[row,26] = ac_contact["actions"].first["text"] + " (" + ac_contact["actions"].first["tstamp"] + ")"
+            wsheet[row,27] = ac_contact["fields"].select{ |k,v| v["tag"] == "%TCOMPANYID%"}.first[1]["val"]
+            wsheet[row,28] = ac_contact["fields"].select{ |k,v| v["tag"] == "%TMONTHLYSALES%"}.first[1]["val"]
+            wsheet[row,29] = ac_contact["fields"].select{ |k,v| v["tag"] == "%T3MONTHLYSALES%"}.first[1]["val"]
+            wsheet[row,30] = ac_contact["fields"].select{ |k,v| v["tag"] == "%T6MONTHLYSALES%"}.first[1]["val"]
 
     		wsheet.save
     		wsheet.reload
@@ -263,7 +616,7 @@ def deal_sync_w_gsheet(doc_name,sheet_name,rand_sleep=3)
 end;
 
 
-deal_sync_w_gsheet 'Jules AC Call Worksheet','Master Call Sheet', 0
+deal_sync_w_gsheet 'Jules AC Call Worksheet','Master Call Sheet NEW', 0
 
 
 
