@@ -10,17 +10,16 @@ def get_from_ac action, query
 end
 
 # Call V3 of the API
-def get_from_ac3 resource, id=''
-	url = id.blank? ? "#{API_ENDPOINT_3}/#{resource}?limit=100" : "#{API_ENDPOINT_3}/#{resource}/#{id}/?limit=100"
+def get_from_ac3 resource, id='', sort_order='ASC'
+	url = id.blank? ? "#{API_ENDPOINT_3}/#{resource}?limit=100&enhance=true&orders[id]=#{sort_order}" : "#{API_ENDPOINT_3}/#{resource}/#{id}"
 	res = JSON.parse(HTTParty.get(url, :headers => {'Content-Type': 'text/json', 'Api-Token': Rails.application.secrets.active_campaign_api_key}).response.body)
 	return res if res['meta'].blank?
-	if res[res.keys.first].count < res['meta']['total'].to_i
-		max = res['meta']['total']
-		while res[res.keys.first].count <= max
-			count = res[res.keys.first].count
-			res2 = HTTParty.get("#{url}&?offset=#{count}", :headers => {'Content-Type': 'text/json', 'Api-Token': Rails.application.secrets.active_campaign_api_key})
-			# puts "Getting #{count}... #{res2.keys.first}"
-			res[res2.keys.first] += res2[res2.keys.first]
+	key = res.keys.first
+	if res[key].count < res['meta']['total'].to_i
+		max = res['meta']['total'].to_i
+		while res[key].count < max
+			res2 = HTTParty.get("#{url}", :query => {:offset => res[key].count}, :headers => {'Content-Type': 'text/json', 'Api-Token': Rails.application.secrets.active_campaign_api_key})
+			res[key] += res2[res2.keys.first]
 		end
 	end
 	return res
