@@ -39,6 +39,9 @@ def get_col(columns, question, regex_matches=nil)
 
     if regex_matches.present?
 
+        match_cols = columns.select{ |k,v| v.match(Regexp.new("^(#{regex_matches})$")) }
+        return match_cols.keys.first+1 if match_cols.size == 1
+
         match_cols = columns.select{ |k,v| v.match(Regexp.new(regex_matches)) }
         return match_cols.keys.first+1 if match_cols.size == 1
 
@@ -63,11 +66,12 @@ def add_website_intel_to_sheet(wsheet_or_session = nil)
     end
 
     columns=Hash[(0...wsheet.rows[0].size).zip wsheet.rows[0]]
-    website_col=get_col(columns, "Where is the website URL stored in?","url|web");
+    website_col=get_col(columns, "Where is the website URL stored in?","website");
     intel_col=get_col(columns, "Where should we store results in?", "cms");
 
     i=2 #skip first row (header)
     pending_changes = 0
+    last_saved_at = Time.now
     while i <= wsheet.max_rows do
 
         if wsheet[i,website_col].present? 
@@ -101,14 +105,17 @@ def add_website_intel_to_sheet(wsheet_or_session = nil)
         i=i+1
 
         if (pending_changes >= 25) # only save max 25 ros
-            RakeHelper::gputs "Saving #{pending_changes} records"
+            timestamp = Time.at(Time.now - last_saved_at).strftime("%M:%S")
+            RakeHelper::gputs "Saving #{pending_changes} records (processed in #{timestamp})"
             wsheet.save
             pending_changes = 0
+            last_saved_at = Time.now
         end
     end
 
     if pending_changes > 0
-        RakeHelper::gputs "Saving the last #{pending_changes} records"
+        timestamp = Time.at(Time.now - last_saved_at).strftime("%M:%S")
+        RakeHelper::gputs "Saving the last #{pending_changes} records (processed in #{timestamp})"
         wsheet.save
     end
 
@@ -120,7 +127,7 @@ def get_website_intel(domain, level=0)
     ua = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'
 
     domain.gsub!(/^http(s)?:\/\//,"")
-    domain.gsub!(/^www\./,"")
+    domain.gsub!(/^w{1,3}\./,"")
     domain.gsub!(/\/$/,"")
     domain.gsub!(/[^a-zA-Z0-9\.\-]/,"")
 
@@ -191,8 +198,10 @@ def get_website_intel(domain, level=0)
         when /Starfield Technologies/i
             intel[:website_cms] = 'GoDaddy'
         when /vinSUITE/i
+            intel[:website_cms] = 'vinSuite'
             intel[:competitor] = 'vinSuite'
         when /eWinery Solutions/
+            intel[:website_cms]  = 'vinSuite (eWinery Solutions)'
             intel[:competitor] = 'vinSuite (eWinery Solutions)'
         when /Wix/i
             intel[:website_cms] = 'Wix.com'
@@ -254,27 +263,27 @@ def get_website_intel(domain, level=0)
     end
 
     tests = {
-        /([a-zA-Z0-9]*)\.securewinemerchant\.com/ => { :competitor => 'simplyCMS', :shop_url => 'https://\1.securewinemerchant.com'},
-        /([a-zA-Z0-9]*)\.orderport\.net/ => { :competitor => 'OrderPort', :shop_url => 'https://\1.orderport.net'},
-        /\?fuseaction/                      => { :competitor => 'eCellar' },
-        /vin65\.com|winedirect\.com/        => { :competitor => 'WineDirect' },
-        /\/cruclub\//                       => { :competitor => 'cruio' },
-        /(wp99234|subscribility)/           => { :competitor => 'Troly' },
-        /\/(wp-content|wp-login)\//         => { :website_cms => 'WordPress' },
-        /cdn\.shopify\.com\//               => { :website_cms => 'shopify' },
-        /cdn\d+\.bigcommerce\.com\//        => { :website_cms => 'BigCommerce' },
-        /www\.web\.com/                     => { :website_cms => 'Custom - Web.com' },
-        /Muse\.Assert\.fail|data-muse-uid/  => { :website_cms => 'Adobe Muse' },
-        /cdn\.nexternal\.com\//             => { :competitor => 'Nexternal' },
-        /static\d+\.squarespace\.com\//     => { :website_cms => 'Squarespace' },
-        /www\.weebly\.com/                  => { :website_cms => 'Weebly' },
-        /platform\.vinespring\.com/         => { :competitor => 'VineSpring' },
-        /\.xudle\.(com|min)/                => { :competitor => 'Xudle' },
-        /\.google-analytics\.com\/analytics\.js/ => { :ga => 'true' },
-        /_gat\._getTracker\("([^"]*)"\)/    => { :ga => '\1' },
-        /instagram\.com\/([^\/\"]*)/        => { :insta => 'https://instagram.com/\1' },
-        /twitter\.com\/([^\/\"]*)/          => { :tw => 'https://twitter.com/\1' },
-        /(fb\.com|facebook\.com)\/([^"]*)/  => { :fb => 'https://fb.com/\2' },
+        /([a-zA-Z0-9]*)\.securewinemerchant\.com/   => { :competitor => 'simplyCMS', :shop_url => 'https://\1.securewinemerchant.com'},
+        /([a-zA-Z0-9]*)\.orderport\.net/            => { :competitor => 'OrderPort', :shop_url => 'https://\1.orderport.net'},
+        /\?fuseaction/                              => { :competitor => 'eCellar' },
+        /vin65\.com|winedirect\.com/                => { :competitor => 'WineDirect' },
+        /\/cruclub\//                               => { :competitor => 'cruio' },
+        /(wp99234|subscribility)/                   => { :competitor => 'Troly' },
+        /\/(wp-content|wp-login)\//                 => { :website_cms => 'WordPress' },
+        /cdn\.shopify\.com\//                       => { :website_cms => 'shopify' },
+        /cdn\d+\.bigcommerce\.com\//                => { :website_cms => 'BigCommerce' },
+        /www\.web\.com/                             => { :website_cms => 'Custom - Web.com' },
+        /Muse\.Assert\.fail|data-muse-uid/          => { :website_cms => 'Adobe Muse' },
+        /cdn\.nexternal\.com\//                     => { :competitor => 'Nexternal' },
+        /static\d+\.squarespace\.com\//             => { :website_cms => 'Squarespace' },
+        /www\.weebly\.com/                          => { :website_cms => 'Weebly' },
+        /platform\.vinespring\.com/                 => { :competitor => 'VineSpring' },
+        /\.xudle\.(com|min)/                        => { :competitor => 'Xudle' },
+        /\.google-analytics\.com\/analytics\.js/    => { :ga => 'true' },
+        /_gat\._getTracker\(['"]([^"']*)['"]\)/     => { :ga => '\1' },
+        /instagram\.com\/([^\/"']*)/                => { :insta => 'https://instagram.com/\1' },
+        /twitter\.com\/([^\/'"]*)/                  => { :tw => 'https://twitter.com/\1' },
+        /(fb\.com|facebook\.com)\/([^'"]*)/         => { :fb => 'https://fb.com/\2' },
     }
     
     tests.each do |t, new_intel|
